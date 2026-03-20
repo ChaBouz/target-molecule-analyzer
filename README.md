@@ -3,114 +3,102 @@
 ---
 
 <a id="japanese"></a>
-# Target Molecule Analyzer 🧬
+# Target Molecule Strategic Analyzer 🧬💊
 
-指定したターゲット遺伝子（ヒト）に関する生化学的・医学的な情報を、複数の主要なパブリックデータベースから自動で収集し、統合されたMarkdownレポートを生成するPythonパイプラインです。
+指定したターゲット遺伝子（ヒト）に関する生化学的・医学的な情報を複数の主要なパブリックデータベースから自動で収集し、**臨床開発やポートフォリオ戦略の立案に特化した**統合Markdownレポートを生成するPythonツールです。
+
+ユーザーの用途に合わせて、**「すぐに使える統合版」**と**「改造しやすいモジュール版」**の2つの形式を提供しています。
 
 ## 🌟 特徴 (Features)
 
-1回の実行で以下の4つのAPIへ自動でアクセスし、情報を集約します。
-* **Open Targets:** 関連疾患（スコア付き）および既存薬の開発状況
-* **UniProt:** タンパク質の基本情報、機能概要、細胞内局在
-* **STRING:** タンパク質間相互作用（PPI）ネットワークの上位リスト
-* **KEGG:** 関連するシグナル伝達パスウェイ（ハイライトされたマップURL付き）
+1回の実行で以下の5つのデータベース/APIへ自動でアクセスし、戦略立案に最適な順序で情報を集約します。
+* **Clinical-First Layout:** 臨床開発で最も重視される「適応症候補（関連疾患リスト）」と「既存薬の状況」をレポートの最上位に配置。
+* **OmniPath:** シグナル伝達の「上流」と「下流」を方向性（活性化/抑制）とともに可視化し、作用機序（MoA）の裏付けをサポート。
+* **Open Targets:** 関連疾患（スコア付き）および既存薬の開発状況。
+* **UniProt:** タンパク質の基本情報、機能概要、細胞内局在。
+* **STRING:** タンパク質間相互作用（PPI）ネットワークの上位リスト（併用療法のターゲット探索に活用）。
+* **KEGG:** 関連するシグナル伝達パスウェイ（見やすい全体図のマップURLへのリンク）。
+
+## 📁 リポジトリの構成 (Repository Structure)
+
+本リポジトリには、用途に合わせた2種類の実行形式が含まれています。
+
+1. **統合版スクリプト (`target_analyzer.py`)**
+   * すべての機能が1つのファイルにまとまっています。**「とにかくツールとして手軽に使いたい」**という方に最適です。
+2. **モジュール版スクリプト (`001` 〜 `007`)**
+   * API取得やレポート生成の機能ごとにファイルが分割されています。**「特定のデータベースを追加したい」「自分でコードを改造・拡張したい」**という開発者・研究者向けです。
 
 ## 📦 動作環境 (Prerequisites)
 
 * Python 3.7 以上
+* 高速パッケージマネージャー: [uv](https://github.com/astral-sh/uv) (推奨)
 * 外部ライブラリ: `requests`
 
-## 🚀 インストール方法 (Installation)
+## 🚀 使い方 (Usage)
 
-1. このリポジトリをダウンロード（または `git clone`）します。
-2. ターミナル（コマンドプロンプト）を開き、プロジェクトのフォルダに移動します。
-3. 以下のコマンドを実行して、必要なライブラリをインストールします。
+面倒な事前インストールは不要です。`uv` を使えば1行のコマンドで実行できます。引数に検索したい遺伝子名（例: `ERBB2`, `EGFR`, `TP53` など）を指定してください。
 
+**A. 統合版（1ファイル）を実行する場合:**
 ```bash
-pip install -r requirements.txt
+uv run --with requests target_analyzer.py ERBB2
 ```
 
-## 💡 使い方 (Usage)
-
-ターミナルで以下のコマンドを実行します。引数に検索したい遺伝子名（例: `EGFR`, `ERBB2`, `TP53` など）を指定してください。
-
+**B. モジュール版を実行する場合:**
 ```bash
-# 統合解析スクリプトを実行する場合
-python target_analyzer.py EGFR
+uv run --with requests 007_master_pipeline.py ERBB2
 ```
 
-※ 引数を指定せずに実行した場合は、デフォルトで `EGFR` の解析が行われます。
+※ 引数を指定せずに実行した場合は、デフォルトで `ERBB2` の解析が行われます。
 
 ### 📂 出力結果について
 
-スクリプトを実行すると、ユーザーのホームディレクトリ内に自動的に出力フォルダが作成され、そこにJSONデータとMarkdownレポートが保存されます。
-
-* **保存先:** `~/Documents/Samplecode/Output/`
-* **出力ファイル例:** * `EGFR_Comprehensive_Report.md` (最終的な統合レポート)
-  * `EGFR_All_Data.json` (取得した全生データ)
-
-## ⚠️ 免責事項 (Disclaimer)
-
-* 本ツールは各パブリックデータベース（UniProt, STRING, KEGG, Open Targets）のAPIを利用しています。データの利用にあたっては、各データベースの利用規約（商用利用の制限など）に従ってください。
-* 本ツールは研究および教育目的で作成されたものであり、出力される情報について医学的な正確性を保証するものではありません。
-
-## 📄 ライセンス (License)
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+実行すると、自動的に出力フォルダ（`~/Documents/Samplecode/Output/`）が作成され、生データ(JSON)と最終的な戦略レポート(`[遺伝子名]_Strategic_Report.md`)が保存されます。
 
 ---
 
 <a id="english"></a>
-# Target Molecule Analyzer 🧬
+# Target Molecule Strategic Analyzer 🧬💊
 
-A Python pipeline that automatically collects biochemical and medical information about a specified target gene (human) from major public databases and generates an integrated Markdown report.
+A Python tool that automatically collects biochemical and medical information about a specified target gene (human) from major public databases, generating an integrated Markdown report **tailored specifically for Clinical Development and Portfolio Strategy**.
+
+We provide two formats to suit your needs: a **"Standalone Version"** for easy use, and a **"Modular Version"** for easy customization.
 
 ## 🌟 Features
 
-With a single run, it automatically accesses the following four APIs and aggregates the information:
-* **Open Targets:** Associated diseases (with scores) and known drug development status.
-* **UniProt:** Basic protein information, functional overview, and subcellular location.
-* **STRING:** Top list of Protein-Protein Interaction (PPI) networks.
-* **KEGG:** Related signal transduction pathways (includes highlighted map URLs).
+* **Clinical-First Layout:** Places "Candidate Indications" and "Known Drug Status" at the very top of the report.
+* **OmniPath Integration:** Extracts directional signaling cascades (Upstream/Downstream) with interaction types (Activation/Inhibition) to clarify MoA.
+* **Open Targets:** Associated diseases and known drug development status.
+* **UniProt:** Basic protein information and subcellular location.
+* **STRING:** Top Protein-Protein Interaction (PPI) networks.
+* **KEGG:** Related signal transduction pathways (with direct map URLs).
+
+## 📁 Repository Structure
+
+1. **Standalone Script (`target_analyzer.py`)**
+   * All features in a single file. Best for **end-users** who want a simple, ready-to-use tool.
+2. **Modular Scripts (`001` to `007`)**
+   * Functions are split into separate files. Best for **developers/researchers** who want to customize, debug, or add new databases.
 
 ## 📦 Prerequisites
 
 * Python 3.7 or higher
+* Fast Python package installer: [uv](https://github.com/astral-sh/uv) (Highly Recommended)
 * External library: `requests`
 
-## 🚀 Installation
+## 🚀 Usage
 
-1. Download or `git clone` this repository.
-2. Open your terminal and navigate to the project folder.
-3. Run the following command to install the required library:
+Using `uv`, you can run the tool in a single command. Specify the target gene name (e.g., `ERBB2`, `EGFR`) as an argument.
 
+**A. To run the Standalone Version:**
 ```bash
-pip install -r requirements.txt
+uv run --with requests target_analyzer.py ERBB2
 ```
 
-## 💡 Usage
-
-Run the following command in your terminal. Specify the target gene name (e.g., `EGFR`, `ERBB2`, `TP53`) as an argument.
-
+**B. To run the Modular Version:**
 ```bash
-# Run the integrated analysis script
-python target_analyzer.py EGFR
+uv run --with requests 007_master_pipeline.py ERBB2
 ```
-*Note: If no argument is specified, the analysis will run for `EGFR` by default.*
 
 ### 📂 Output Details
 
-Upon execution, an output folder is automatically created in your home directory, saving the JSON data and Markdown report.
-* **Save Location:** `~/Documents/Samplecode/Output/`
-* **Output Files Example:**
-  * `EGFR_Comprehensive_Report.md` (Final integrated report)
-  * `EGFR_All_Data.json` (All raw data retrieved)
-
-## ⚠️ Disclaimer
-
-* This tool utilizes APIs from public databases (UniProt, STRING, KEGG, Open Targets). Please adhere to the terms of service (e.g., restrictions on commercial use) of each database when using the data.
-* This tool was created for research and educational purposes and does not guarantee the medical accuracy of the output information.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+An output folder (`~/Documents/Samplecode/Output/`) will be automatically created, saving the intermediate JSON data and the final report (`[GENE]_Strategic_Report.md`).
